@@ -8,7 +8,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import DragAndDropPanel from "./components/DragAndDropPanel";
+import Board from "./components/Board";
 import ModalComponent from "./core/Modal";
 import { addNewCard } from "./redux/global";
 import { useAppDispatch } from "./redux/hooks";
@@ -51,7 +51,7 @@ function App() {
           Add Card
         </Button>
         <Box>
-          <DragAndDropPanel />
+          <Board />
         </Box>
       </Box>
       <ModalComponent
