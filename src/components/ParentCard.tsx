@@ -1,31 +1,32 @@
-import { EditIcon } from "@chakra-ui/icons";
 import {
   Box,
-  Flex,
   FormControl,
   FormLabel,
-  IconButton,
   Input,
-  Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Droppable } from "@hello-pangea/dnd";
+import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { useState } from "react";
-import CircularNumber from "../core/CircularNumber";
 import ModalComponent from "../core/Modal";
 import { editCard } from "../redux/global";
 import { useAppDispatch } from "../redux/hooks";
 import { Parent } from "../types";
 import ChildCard from "./ChildCard";
+import ParentCardHeader from "./ParentCardHeader";
+
+interface ParentCardProps extends Parent {
+  index: number;
+}
 
 const ParentCard = ({
   cardCount,
   cardName,
   id,
+  index,
   color,
   isDefault,
   dispatches,
-}: Parent) => {
+}: ParentCardProps) => {
   const dispatch = useAppDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -57,64 +58,57 @@ const ParentCard = ({
   };
 
   return (
-    <Droppable droppableId={id}>
-      {(provided) => (
-        <Box width={250} overflow="auto" flexShrink={0}>
-          <Box
-            rounded="sm"
-            textTransform={isDefault ? "uppercase" : "none"}
-            bg={"primary"}
-            borderRadius={4}
-            fontWeight="bold"
-            borderTop={"2px"}
-            borderColor={color}
-            marginBottom={4}
-            maxH={12}
-            px={4}
-            py={2}
-            display="flex"
-            justifyContent={"space-between"}
-            alignItems={"center"}
-          >
-            <Text>{cardName}</Text>
-            <Flex alignItems={"center"} justifyContent="space-between" gap={2}>
-              {!isDefault && (
-                <IconButton
-                  aria-label="Edit Card"
-                  icon={<EditIcon />}
-                  background="transparent"
-                  _hover={{ background: "transparent" }}
-                  onClick={onOpen}
-                />
-              )}
-              <CircularNumber number={cardCount} />
-            </Flex>
-          </Box>
-
-          <Box minH={550} {...provided.droppableProps} ref={provided.innerRef}>
-            {dispatches?.map(
-              (
-                {
-                  dispatchName,
-                  dispatchNumber,
-                  dispatchTerminal,
-                  dispatchTime,
-                  driverName,
-                },
-                index
-              ) => (
-                <ChildCard
-                  key={`${dispatchName}-${dispatchNumber}-${index}}`}
-                  dispatchName={dispatchName}
-                  dispatchNumber={dispatchNumber}
-                  dispatchTerminal={dispatchTerminal}
-                  dispatchTime={dispatchTime}
-                  driverName={driverName}
-                  index={index}
-                />
-              )
+    <Draggable draggableId={id} index={index}>
+      {(provided, snapshot) => (
+        <Box
+          width={250}
+          overflow="auto"
+          flexShrink={0}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          <ParentCardHeader
+            cardCount={cardCount}
+            cardName={cardName}
+            color={color}
+            isDefault={isDefault}
+            onOpen={onOpen}
+            isDragging={snapshot.isDragging}
+          />
+          <Droppable droppableId={id}>
+            {(provided) => (
+              <Box
+                minH={550}
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                {dispatches?.map(
+                  (
+                    {
+                      dispatchName,
+                      dispatchNumber,
+                      dispatchTerminal,
+                      dispatchTime,
+                      driverName,
+                    },
+                    idx
+                  ) => (
+                    <ChildCard
+                      key={`${dispatchName}-${dispatchNumber}-${idx}}`}
+                      dispatchName={dispatchName}
+                      dispatchNumber={dispatchNumber}
+                      dispatchTerminal={dispatchTerminal}
+                      dispatchTime={dispatchTime}
+                      driverName={driverName}
+                      index={idx}
+                    />
+                  )
+                )}
+                {provided.placeholder}
+              </Box>
             )}
-          </Box>
+          </Droppable>
           <ModalComponent
             isOpen={isOpen}
             onClose={handleClose}
@@ -147,7 +141,7 @@ const ParentCard = ({
           </ModalComponent>
         </Box>
       )}
-    </Droppable>
+    </Draggable>
   );
 };
 
