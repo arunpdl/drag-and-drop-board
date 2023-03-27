@@ -41,7 +41,7 @@ function App() {
 
   return (
     <>
-      <Box id="ddd" bg={"background"} height={"100vh"} width={"100vw"} p={4}>
+      <Box bg={"background"} height={"100vh"} width={"100vw"} p={4}>
         <Button
           colorScheme={"blue"}
           size="sm"
